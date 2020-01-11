@@ -16,7 +16,6 @@ from rest_framework.generics import (
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from ..models import Profile
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
@@ -162,94 +161,5 @@ class UserView(ModelViewSet):
 
 
 
-class FollowUnfollowAPIView(APIView):
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = 'username'
-    queryset = User.objects.all()
-
-    def get(self, request, slug, format=None):
-        message = "ERROR"
-        toggle_user = get_object_or_404(User, username__iexact=slug)
-        if request.user.is_authenticated:
-            # print("Hey", request.user, toggle_user)
-            is_following = Profile.objects.toggle_follow(request.user, toggle_user)
-            user_qs = get_object_or_404(User, username=toggle_user)
-            serializer = UserSerializer(user_qs,context={'request': request})
-            serializer2 = UserSerializer(request.user,context={'request': request})
-            new_serializer_data = dict(serializer.data)
-            new_serializer_data2 = dict(serializer2.data)
-            new_serializer_data.update({'following': is_following})
-            new_serializer_data.update({'count': request.user.profile.following.all().count()})
-            new_serializer_data.update({'count2': toggle_user.followed_by.all().count()})
-            new_serializer_data.update({'logged': new_serializer_data2})
-            return Response(new_serializer_data)
-        return Response({"message": message}, status=400)
 
 
-class FollowRemoveAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, slug, format=None):
-        message = "ERROR"
-        toggle_user = get_object_or_404(User, username__iexact=slug)
-        if request.user.is_authenticated:
-            # print("Hey", request.user, toggle_user)
-            is_following = Profile.objects.toggle_remove_follow(request.user, toggle_user)
-            user_qs = get_object_or_404(User, username=toggle_user)
-            serializer = UserSerializer(user_qs,context={'request': request})
-            new_serializer_data = dict(serializer.data)
-            new_serializer_data.update({'following': is_following})
-            new_serializer_data.update({'count': request.user.followed_by.all().count()})
-            return Response(new_serializer_data)
-        return Response({"message": message}, status=400)
-
-# class UserPostListAPIView(ListAPIView):
-#     serializer_class = PostDetailSerializer
-#     pagination_class = StandardResultPagination
-
-#     def get_queryset(self, *args, **kwargs):
-#         qsuser = Post.objects.filter(user__username=self.kwargs['slug']).order_by("-updated_on")
-#         print(self.request.GET)
-#         search = self.request.GET.get("s", None)
-#         if search:
-#             qsfn = qsuser.annotate(full_name=Concat('user__first_name', Value(' '), 'user__last_name'))
-#             qs=qsfn.filter(
-#                 Q(content__icontains=search) |
-#                 Q(user__username__icontains=search) |
-#                 Q(user__first_name__icontains=search) |
-#                 Q(user__last_name__icontains=search) |
-#                 Q(full_name__icontains=search)
-#             )
-#             return qs
-#         else:
-#             return qsuser
-
-
-
-
-
-
-#Useless
-# class UserCreateAPIView(CreateAPIView):
-#     serializer_class = UserCreateSerializer
-#     queryset = User.objects.all()
-#     def post(self,request,*args,**kwargs):
-#         serializer = UserCreateSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             subject="Thank you for signing up!"
-#             message="Welcome to local host"
-#             from_mail=settings.EMAIL_HOST_USER
-#             to_list=[serializer.data['email'],settings.EMAIL_HOST_USER]
-#             # send_mail(subject,message,from_mail,to_list,fail_silently=True)
-#             return Response(serializer.data, status=HTTP_201_CREATED)
-#         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-# class UserLoginAPIView(APIView):
-#     permission_classes=[AllowAny]
-#     serializer_class = UserLoginSerializer
-#     def post(self,request,*args,**kwargs):
-#         serializer = UserLoginSerializer(data=request.data)
-#         if serializer.is_valid(raise_exception=True):
-#             return Response(serializer.data,status=HTTP_200_OK)
-#         return Response(serializer.errors,status=HTTP_400_BAD_REQUEST)    

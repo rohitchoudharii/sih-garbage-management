@@ -48,18 +48,10 @@ INSTALLED_APPS = [
     'allauth.account',
     'rest_auth',
     'rest_auth.registration',
-    'frontend',
     'core',
     
 ]
-REACT_ROUTES = [
-    'inbox',
-    'search',
-    'settings',
-    'password-reset',
-    'password-change',
-    'about',
-]
+
 
 SITE_ID = 2
 
@@ -72,7 +64,6 @@ SESSION_COOKIE_AGE=1209
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # One month (defined in seconds)
 
-AUTH_PROFILE_MODULE = 'core.profile'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 100
