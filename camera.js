@@ -45,7 +45,13 @@ function takePhoto() {
   imageCapturer.takePhoto()
     .then((blob) => {
       console.log("Photo taken: " + blob.type + ", " + blob.size + "B")
-      imageTag.src = URL.createObjectURL(blob);
+      var a=new FileReader()
+      a.onload=function(e){
+        imageTag.src =e.target.result
+        console.log(a)
+      }
+      a.readAsDataURL(blob)
+      // imageTag.src = URL.createObjectURL(blob);
     })
     .catch((err) => { 
       console.error("takePhoto() failed: ", e);

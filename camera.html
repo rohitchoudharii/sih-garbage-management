@@ -25,8 +25,11 @@
 <p>Click the button to get your coordinates.</p>
 
 <button onclick="getLocation()">Try It</button>
-
+<p id="latitude" ></p>
+<p id="longitude" ></p>
 <p id="demo"></p>
+<button id="submitgarbage" >Click</button>
+
 <script
   src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script>
@@ -39,23 +42,29 @@ function getLocation() {
     x.innerHTML = "Geolocation is not supported by this browser.";
   }
 }
-    
+  
 function showPosition(position) {
-    x.innerHTML="Latitude: " + position.coords.latitude + 
-    "<br>Longitude: " + position.coords.longitude;
+    // x.innerHTML="Latitude: " + position.coords.latitude + 
+    // "<br>Longitude: " + position.coords.longitude;
+    $("#latitude").html(position.coords.latitude)
+    $("#longitude").html(position.coords.longitude)
 }
 $("#submitgarbage").click(function(e){
-	console.log("Hello")
+	console.log("Hello",$("#latitude").html())
 	e.preventDefault()
 	$.ajax({
-	    url: "http://localhost:8000/api/garbage",
-	    data: "formData",
+	    url: "http://176486bf.ngrok.io/api/garbage/",
+	    data: JSON.stringify({
+	    	"photo":$("#image-tag").attr("src"),
+	    	"latitude":$("#latitude").html(),
+	    	"longitude":$("#longitude").html()
+	    }),
 	    method: "POST",
-	    // async: true,
-	    cache: false,
-	    contentType: false,
-	    enctype: 'multipart/form-data',
-	    processData: false,
+	    async: true,
+            cache: false,
+            contentType: "application/json",
+            enctype: 'multipart/form-data',
+            processData: false,
 	    success: function(data){
 	        console.log("success")
 	    },
@@ -67,7 +76,6 @@ $("#submitgarbage").click(function(e){
 	})
 })
 </script>
-<button id="submitgarbage" >Click</button>
 </div>
 </body>
 <script src="camera.js"></script>
