@@ -85,12 +85,12 @@ class GarbageDataSerializer(Serializer):
     photo=Base64ImageField(required=False,max_length=None,use_url=True,allow_empty_file=True)
     latitude=FloatField()
     longitude=FloatField()
-    pass
+    formatted_address=CharField(required=False)
     class Meta:
         model = GarbageDataModel
-        fields= ('id','photo','latitude','longitude')
+        fields= ('id','photo','latitude','longitude','formatted_address')
     def create(self, validated_data):
-        print(validated_data["photo"])
+        print(validated_data["latitude"])
         return GarbageDataModel.objects.create(**validated_data)
 
 class LoginSerializer(Serializer):
