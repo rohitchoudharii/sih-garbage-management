@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
+from .models import GarbageDataModel
 
 import pprint
 from django.contrib.sessions.models import Session
@@ -13,4 +14,5 @@ class SessionAdmin(admin.ModelAdmin):
     readonly_fields = ['_session_data']
     exclude = ['session_data']
 admin.site.register(Session, SessionAdmin)
+admin.site.register(GarbageDataModel)
 

@@ -34,7 +34,7 @@ urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
     path('rest-auth/registration/account-confirm-email/<key>/', ConfirmEmailView.as_view(),name="custom-email-confirm-api"),
     path('rest-auth/registration/', include('rest_auth.registration.urls')),
-    path('api/user/', include('core.api.urls',namespace='core-api')),
+    path('api/', include('core.api.urls',namespace='core-api')),
 ]
    
 

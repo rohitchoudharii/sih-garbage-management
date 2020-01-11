@@ -13,6 +13,8 @@ from rest_framework.serializers import (
     Serializer,
     SerializerMethodField,
     RelatedField,
+    FileField,
+    FloatField
 )
 from rest_framework import exceptions
 import requests
@@ -27,6 +29,18 @@ from allauth.utils import (email_address_exists,
 from allauth.account import app_settings as allauth_settings
 from rest_auth.models import TokenModel
 User=get_user_model()
+from ..models import GarbageDataModel
+
+class GarbageDataSerializer(Serializer):
+    photo=FileField()
+    latitude=FloatField()
+    longitude=FloatField()
+    pass
+    class Meta:
+        model = GarbageDataModel
+        fields= ('id','photo','latitude','longitude')
+    def create(self, validated_data):
+        return GarbageDataModel.objects.create(**validated_data)
 
 class LoginSerializer(Serializer):
     username = CharField(required=False, allow_blank=True)
@@ -159,7 +173,6 @@ class PasswordResetConfirmSerializer(Serializer):
 class UserSerializer(ModelSerializer):
     # pk = PrimaryKeyRelatedField(queryset=User.objects.all())
     current_user = SerializerMethodField('curruser')
-    followed_by=SerializerMethodField()
     class Meta:
         model=User
         fields=[
@@ -192,7 +205,6 @@ class UserSerializer(ModelSerializer):
 class UserRUDSerializer(ModelSerializer):
     pk = PrimaryKeyRelatedField(queryset=User.objects.all())
     current_user = SerializerMethodField('curruser')
-    followed_by=SerializerMethodField()
     class Meta:
         model=User
         fields=[
@@ -201,9 +213,7 @@ class UserRUDSerializer(ModelSerializer):
             'email',
             'first_name',
             'last_name',
-            'profile',
             'current_user',
-            'followed_by',
         ]
 
     def curruser(self, obj):

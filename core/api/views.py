@@ -6,8 +6,10 @@ from django.db.models import Q
 from django.db.models.functions import Concat
 from django.db.models import Value
 from .serializers import (
-    UserSerializer
+    UserSerializer,
+    GarbageDataSerializer
 )
+from ..models import GarbageDataModel
 from rest_framework.generics import (
     CreateAPIView,
     RetrieveUpdateDestroyAPIView,
@@ -161,5 +163,52 @@ class UserView(ModelViewSet):
 
 
 
+class GarbageDataView(ModelViewSet):
+    lookup_field= 'pk'
+    serializer_class=GarbageDataSerializer
+    permission_classes = [AllowAny]
+    queryset =GarbageDataModel.objects.all()
 
+    def get_queryset(self, *args, **kwargs):
+        queryset = super(GarbageDataView, self).get_queryset(*args, **kwargs)
+        qs=GarbageDataModel.objects.all()
+        # query=self.request.GET.get('s')
+        # if query is not None:
+        #     qs=qs.filter(
+        #         Q(username__icontains=query)|
+        #         Q(first_name__icontains=query)|
+        #         Q(last_name__icontains=query)
+        #     ).distinct()
+        return qs
+    
+    def retrieve(self, request, pk, *args, **kwargs):
+        print("current pk",pk,request.user.pk)
+        if not request.user.is_authenticated:
+            return Response({"detail": "Auth not provided."}, status=400)
+        else:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+            
+    def update(self, request, pk, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Auth not provided."}, status=400)
+        # elif int(pk)!=int(request.user.pk):
+        #     return Response({"detail": "Not found."}, status=400)
+        else:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data)
+
+    def destroy(self, request, pk, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Auth not provided."}, status=400)
+        # elif int(pk)!=int(request.user.pk):
+        #     return Response({"detail": "Not found."}, status=400)
+        else:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
